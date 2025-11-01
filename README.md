@@ -1,6 +1,47 @@
 # Personalized Horoscope API
 A backend service that generates and serves personalized daily horoscopes for users based on their zodiac sign. This assignment focuses on creating the core APIs, storing user data, and fetching daily horoscope content.
 
+## Design decisions (current system)
+- Architecture: small Express.js API with clear separation — routes, controllers, middleware (JWT auth, rate-limit), and utils for zodiac logic and the horoscope store. Keeps responsibilities separated and easy to test.
+- Data model:
+	- A lightweight `zodiac -> horoscope templates` storage (DB-backed).
+	- A utility `getZodiac` to map birthdate → zodiac.
+	This approach is simple, fast, and easy to seed/update.
+- Generation approach: template-driven messages (DB templates + simple variables) produced at request-time. This minimizes storage and makes updates simple. Rate limiting and JWT protect abuse and personalization endpoints.
+
+## Improvements I'd make with more time
+- Robust infra:
+	- Introduce Redis for caching to reduce repeated generation.
+	- Configure read replicas and/or partitioning for DB scaling.
+- Personalization quality:
+	- Support better user profiles (birthplace/time, preferences) for more accurate personalization.
+	- Use a templating engine with conditional logic and variable substitution for flexible message composition.
+	- Optionally add lightweight ML or rule-based models to match style/personality to user preferences.
+- Security & privacy:
+	- Stronger PII handling (minimal storage, access controls) and encryption at rest.
+	- Permissioned access controls, audit logs, and deletion workflows for GDPR/privacy compliance.
+
+## How this will scale when each user gets a personalized horoscope
+
+- Caching with Redis
+	- Key scheme: `horoscope:{date}:{userId}` with a TTL set to 24h.
+		- Explanation: using a date+user key ensures each user's daily horoscope is cached independently while keeping keys compact and predictable.
+	- Cache-first flow: Redis → Postgres → generate → write back.
+		- Explanation: Try Redis first for low latency. On miss, read user/profile data from Postgres and attempt to fetch any stored personalized result. If still missing, generate the horoscope (fast template or worker-assisted), write the result back to Redis and optionally persist to Postgres (if historical snapshots are required).
+	- Benefits & trade-offs: drastically reduces compute and latency for repeat requests; must manage cache invalidation when templates or personalization logic change.
+
+- Autoscaling
+	- Scale stateless Node instances horizontally using metrics like CPU (target 50–70%) and request rate (RPS).
+		- Explanation: stateless servers are easy to scale behind a load balancer; CPU and request-rate-based autoscaling balances cost and responsiveness. Include health/readiness probes to avoid routing traffic to unhealthy instances.
+	- Use a load balancer (or API gateway), connection pooling for the DB, and ephemeral local caches only for per-instance transient state.
+		- Explanation: pooling reduces DB connections and improving throughput; avoid sticky sessions unless needed — prefer token-based auth (JWT) for statelessness.
+
+- Database Indexing (Postgres)
+	- Create unique index on `users(email)` and composite index on `personalized_horoscopes(user_id, date)`.
+		- Explanation: `users(email)` uniqueness enforces data integrity and speeds lookups during auth/registration. The composite index makes fetching a single user's horoscope for a specific date fast and efficient.
+	- Partition `personalized_horoscopes` table by date (monthly) and index the `date` column.
+		- Explanation: range (monthly) partitioning reduces query/maintenance cost for large historical datasets and keeps indexes smaller. Indexing `date` helps time-range queries (e.g., analytics or export) perform well.
+
 ## Requirements
 
 - Node.js (v16+ recommended) and npm
@@ -183,9 +224,3 @@ Or run `psql` interactively and `SELECT * FROM users;`.
 - If you changed DB credentials, update `src/postgresql/index.js`.
 - If you see errors about missing tables, make sure you created the `users` table as shown above.
 
-## Notes
-
-- This README shows a minimal development setup using Docker for PostgreSQL. For production, move DB credentials to environment variables, add migrations, and secure secrets.
-
-If you want, I can add a small SQL migration script under `scripts/` and a simple `npm` script that applies it automatically. Would you like that?
-A backend service that generates and serves personalized daily horoscopes for users based on their zodiac sign. This assignment focuses on creating the core APIs, storing user data, and fetching daily horoscope content.
