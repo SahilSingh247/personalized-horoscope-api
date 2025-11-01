@@ -1,3 +1,6 @@
+--after creating container 
+--docker exec -it horoscope-postgres psql -U postgres -d horoscope_db
+
 -- Creating Users Table
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
