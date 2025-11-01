@@ -5,6 +5,7 @@ A backend service that generates and serves personalized daily horoscopes for us
 
 - Node.js (v16+ recommended) and npm
 - Docker (for running PostgreSQL in a container)
+- AI used: GitHub Copilot(with GPT 5.0) for code suggestions and generating horoscope data 
 
 This project already includes a simple PostgreSQL connection at `src/postgresql/index.js` which is pre-configured to connect to:
 
@@ -32,7 +33,7 @@ The project expects a PostgreSQL server accessible at localhost:5431. The easies
 Run this in PowerShell:
 
 ```powershell
-docker run --name personalized-horoscope-db -e POSTGRES_PASSWORD=mysecretpassword -e POSTGRES_USER=postgres -e POSTGRES_DB=horoscope_db -p 5431:5432 -d postgres:15
+docker run --name personalized-horoscope-db -e POSTGRES_PASSWORD=mysecretpassword -e POSTGRES_USER=postgres -e POSTGRES_DB=horoscope_db -p 5431:5432 -d postgres:16
 ```
 
 Notes:
