@@ -4,7 +4,7 @@
   "description": "A backend service that generates and serves personalized daily horoscopes for users based on their zodiac sign. This assignment focuses on creating the core APIs, storing user data, and fetching daily horoscope content.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/server.js"
   },
   "keywords": [],
   "author": "",
