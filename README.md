@@ -19,7 +19,7 @@ A backend service that generates and serves personalized daily horoscopes for us
 	- Optionally add lightweight ML or rule-based models to match style/personality to user preferences.
 - Security & privacy:
 	- Stronger PII handling (minimal storage, access controls) and encryption at rest.
-	- Permissioned access controls, audit logs, and deletion workflows for GDPR/privacy compliance.
+	- Permissioned access controls, audit logs, and deletion workflows for compliance.
 
 ## How this will scale when each user gets a personalized horoscope
 
