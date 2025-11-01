@@ -1,7 +1,7 @@
 --after creating container 
 --docker exec -it horoscope-postgres psql -U postgres -d horoscope_db
 
--- Creating Users Table
+-- Creating Users and Horoscope History Tables
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -13,7 +13,6 @@ CREATE TABLE users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Creating Horoscope History Table
 CREATE TABLE horoscope_history (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,

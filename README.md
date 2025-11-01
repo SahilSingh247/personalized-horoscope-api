@@ -68,6 +68,16 @@ CREATE TABLE users (
 	zodiac_sign TEXT,
 	created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
+
+CREATE TABLE horoscope_history (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    zodiac_sign VARCHAR(20) NOT NULL,
+    date DATE NOT NULL,
+    horoscope_text TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, date)
+);
 \q
 ```
 
