@@ -91,8 +91,6 @@ docker logs -f personalized-horoscope-db
 
 This repository doesn't include automated migrations, so you should create the `users` table before registering users.
 
-Option A — run psql interactively inside the container (recommended):
-
 ```powershell
 docker exec -it personalized-horoscope-db psql -U postgres -d horoscope_db
 ```
@@ -120,12 +118,6 @@ CREATE TABLE horoscope_history (
     UNIQUE(user_id, date)
 );
 \q
-```
-
-Option B — one-liner (PowerShell):
-
-```powershell
-docker exec -it personalized-horoscope-db psql -U postgres -d horoscope_db -c "CREATE TABLE users (id SERIAL PRIMARY KEY, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL, birthdate DATE NOT NULL, zodiac_sign TEXT, created_at TIMESTAMP WITH TIME ZONE DEFAULT now());"
 ```
 
 If you use a different DB name, user, or password update `src/postgresql/index.js` accordingly.
